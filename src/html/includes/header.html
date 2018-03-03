@@ -1,0 +1,11 @@
+<header>
+  <h1>header ... </h1>
+  <p>Hello {{name}}</p>
+  {{if todo}}
+  <ul>
+    {{each todo}}
+    <li>{{$index}} - {{$value}}</li>
+    {{/each}}
+  </ul>
+  {{/if}}
+</header>
