@@ -232,6 +232,7 @@ gulp.task('build:html', () => {
   gulp.src(htmlArr, { base: '' })
     .pipe(htmltpl({
       tag: 'template',
+      dataTag: 'data',
       engine (template, data) {
         return artTemplate.compile(template)(data)
       },
