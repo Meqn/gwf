@@ -1,7 +1,14 @@
 
 # QwebFlow
 
-gulp work flow
+Gulp开发web页面的自动化构建任务
+
+ - 本地服务器，HTTP代理，自动打开浏览器
+ - Mock模拟数据
+ - image: 压缩，hash
+ - style: SCSS，自动前缀，压缩，hash
+ - script:
+ - html: 模版引擎
 
 
 ### 文件目录
