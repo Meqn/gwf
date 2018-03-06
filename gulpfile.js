@@ -24,6 +24,9 @@ const jEditor = require('gulp-json-editor')
 const lazypipe = require('lazypipe')
 const connect = require('gulp-connect')
 const proxy = require('http-proxy-middleware')
+const open = require('open')
+const chalk = require('chalk')
+const log = require('fancy-log')
 
 const rename = require('gulp-rename')
 const concat = require('gulp-concat')
@@ -96,7 +99,7 @@ let manifestTask = lazypipe()
  * 功能：HTTP服务, 代理, 自动更新
  */
 gulp.task('server', function () {
-  connect.server({
+  var webServe = connect.server({
     name: 'web',
     host: '0.0.0.0',
     root: DIST_DIR,
@@ -114,6 +117,15 @@ gulp.task('server', function () {
         })
       ]
     }
+  }, function() {
+    let webUrl = `${this.https ? 'https' : 'http'}://${this.host}:${this.port}/`
+    setTimeout(() => {
+      open(webUrl)
+    }, 1000)
+
+    log(chalk.yellow('😀 :::::::::::::::::::::::::::::::::::::::: 😀'))
+    log(`Open in browser : ${chalk.bgBlue(webUrl)}`)
+    log(chalk.yellow('😀 :::::::::::::::::::::::::::::::::::::::: 😀'))
   })
 })
 
@@ -137,7 +149,7 @@ gulp.task('build:image', (done) => {
     .pipe(connect.reload())
     .on('end', () => {
       done()
-      console.log('🚀 . build image done ... ')
+      log('🚀 . build image done ... ')
     })
 })
 gulp.task('build:image:hash', (done) => {
@@ -171,7 +183,7 @@ gulp.task('build:style', (done) => {
     .pipe(connect.reload())
     .on('end', () => {
       done()
-      console.log('🚀 . build style done ... ')
+      log('🚀 . build style done ... ')
     })
 })
 gulp.task('build:style:hash', (done) => {
@@ -207,7 +219,7 @@ gulp.task('build:script', (done) => {
         count++
         if (count === sFiles.length) {
           done()
-          console.log('🚀 . build script done ... ')
+          log('🚀 . build script done ... ')
         }
       })
   })
@@ -252,7 +264,7 @@ gulp.task('build:html', () => {
  */
 gulp.task('clean', (done) => {
   return del([MANIFEST_PATH, DIST_DIR]).then(paths => {
-    console.log('clean files: \n', paths.join('\n'))
+    log('clean files: \n', paths.join('\n'))
   })
 })
 
