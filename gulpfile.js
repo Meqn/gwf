@@ -48,14 +48,15 @@ const htmlmin = require('gulp-htmlmin')
 const htmltpl = require('gulp-html-tpl')
 const artTemplate = require('art-template')
 
-
+/** 
+ * config
+*/
 const pkg = require('./package.json')
 const script_files = require('./src/scripts/script.map')
 const static_files = [
   'src/fonts/**',
   'src/libs/**'
 ]
-
 const OPTION = { base: 'src' }
 const ROOT_PATH = '/'
 const ASSETS_PATH = '/assets/'
@@ -88,11 +89,11 @@ function transformHash (json) {
 /**
  * 处理 manifest转换管道任务
 */
-let manifestTask = lazypipe()
-  .pipe(jEditor, function (file) {
+const manifestTask = (name) => {
+  return lazypipe().pipe(rev).pipe(rev.manifest, `${name}_manifest.json`).pipe(jEditor, function (file) {
     return transformHash(file)
-  })
-  .pipe(gulp.dest, MANIFEST_PATH)
+  }).pipe(gulp.dest, MANIFEST_PATH)
+}
 
 /**
  * 启动本地服务器
@@ -124,7 +125,7 @@ gulp.task('server', function () {
     }, 1000)
 
     log(chalk.yellow('😀 :::::::::::::::::::::::::::::::::::::::: 😀'))
-    log(`Open in browser : ${chalk.bgBlue(webUrl)}`)
+    log(`Open in browser : ${chalk.blue(webUrl)}`)
     log(chalk.yellow('😀 :::::::::::::::::::::::::::::::::::::::: 😀'))
   })
 })
@@ -154,10 +155,7 @@ gulp.task('build:image', (done) => {
 })
 gulp.task('build:image:hash', (done) => {
   gulp.src(`${DIST_DIR}/${ASSETS_DIR}/images/**`, { base: DIST_DIR })
-    .pipe(rev())
-    .pipe(rev.manifest('image_manifest.json'))
-    // .pipe(gulp.dest(MANIFEST_PATH))
-    .pipe(manifestTask())
+    .pipe(manifestTask('image')())
     .on('end', done)
 })
 
@@ -188,9 +186,7 @@ gulp.task('build:style', (done) => {
 })
 gulp.task('build:style:hash', (done) => {
   gulp.src(`${DIST_DIR}/${ASSETS_DIR}/styles/**`, { base: DIST_DIR })
-    .pipe(rev())
-    .pipe(rev.manifest('style_manifest.json'))
-    .pipe(manifestTask())
+    .pipe(manifestTask('style')())
     .on('end', done)
 })
 
@@ -226,9 +222,7 @@ gulp.task('build:script', (done) => {
 })
 gulp.task('build:script:hash', (done) => {
   gulp.src(`${DIST_DIR}/${ASSETS_DIR}/scripts/**`, { base: DIST_DIR })
-    .pipe(rev())
-    .pipe(rev.manifest('script_manifest.json'))
-    .pipe(manifestTask())
+    .pipe(manifestTask('script')())
     .on('end', done)
 })
 
@@ -248,7 +242,9 @@ gulp.task('build:html', () => {
       engine (template, data) {
         return artTemplate.compile(template)(data)
       },
-      data: {}
+      data: {
+        env: 'develop'
+      }
     }))
     .pipe(replace('/@/', ROOT_PATH))
     .pipe(replace('/@#/', ASSETS_PATH))
@@ -271,15 +267,14 @@ gulp.task('clean', (done) => {
 /**
  * 发布站点
  */
-gulp.task('build', ['clean'], () => {
-  let buildTask = ['build:assets', 'build:image', 'build:style', 'build:script']
-  let hashTask = ['build:image:hash', 'build:style:hash', 'build:script:hash']
-  let htmlTask = ['build:html']
-  if (PROD && HASH) {
-    return runSequence(...buildTask, ...hashTask, ...htmlTask)
-  } else {
-    return runSequence(...buildTask, ...htmlTask)
-  }
+gulp.task('build', ['clean'], (taskDone) => {
+  runSequence(['build:assets', 'build:image', 'build:style', 'build:script'], 'build:html', () => {
+    taskDone()
+    log(chalk.bgGreen('build success .... ✅ .'))
+    if (HASH) {
+      runSequence('build:image:hash', 'build:style:hash', 'build:script:hash', 'build:html')
+    }
+  })
 })
 
 /**

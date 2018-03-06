@@ -5,9 +5,9 @@
   "main": "index.js",
   "scripts": {
     "start": "npm run dev",
-    "dev": "gulp -w",
+    "dev": "gulp --watch --server",
     "build": "gulp build",
-    "product": "gulp build --prod"
+    "product": "gulp build --prod --hash"
   },
   "repository": {
     "type": "git",
