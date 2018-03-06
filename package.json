@@ -1,6 +1,6 @@
 {
   "name": "QwebFlow",
-  "version": "0.0.1",
+  "version": "1.0.1",
   "description": "gulp work flow",
   "main": "index.js",
   "scripts": {
