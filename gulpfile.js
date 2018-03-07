@@ -54,8 +54,7 @@ const artTemplate = require('art-template')
 const pkg = require('./package.json')
 const script_files = require('./src/scripts/script.map')
 const static_files = [
-  'src/fonts/**',
-  'src/libs/**'
+  'public/**'
 ]
 const OPTION = { base: 'src' }
 const ROOT_PATH = '/'
@@ -133,8 +132,8 @@ gulp.task('server', function () {
 /**
  * 复制不需要处理的资源文件
  */
-gulp.task('build:assets', () => {
-  return gulp.src(static_files, OPTION)
+gulp.task('build:assets', (done) => {
+  return gulp.src(static_files)
     .pipe(gulp.dest(`${DIST_DIR}/${ASSETS_DIR}/`))
     .pipe(connect.reload())
 })
@@ -247,7 +246,7 @@ gulp.task('build:html', () => {
       }
     }))
     .pipe(replace('/@/', ROOT_PATH))
-    .pipe(replace('/@#/', ASSETS_PATH))
+    .pipe(replace('/@@/', ASSETS_PATH))
     .pipe(revCollector({
       revSuffix: '\\?[0-9a-f]{8,10}'
     }))
@@ -268,7 +267,7 @@ gulp.task('clean', (done) => {
  * 发布站点
  */
 gulp.task('build', ['clean'], (taskDone) => {
-  runSequence(['build:assets', 'build:image', 'build:style', 'build:script'], 'build:html', () => {
+  runSequence('build:assets', ['build:image', 'build:style', 'build:script'], 'build:html', () => {
     taskDone()
     log(chalk.bgGreen('build success .... ✅ .'))
     if (HASH) {
