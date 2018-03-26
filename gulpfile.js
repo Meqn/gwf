@@ -48,24 +48,21 @@ const htmlmin = require('gulp-htmlmin')
 const htmltpl = require('gulp-html-tpl')
 const artTemplate = require('art-template')
 
-/** 
- * config
-*/
-const pkg = require('./package.json')
-const script_files = require('./src/scripts/script.map')
-const static_files = [
-  'public/**'
-]
-const OPTION = { base: 'src' }
-const ROOT_PATH = '/'
-const ASSETS_PATH = '/assets/'
-const ASSETS_DIR = 'assets'
-const DIST_DIR = 'dist'
-const MANIFEST_PATH = `${DIST_DIR}/manifest/`
 
-const PORT = argv.p || 3000
-const PROD = argv.prod
-const HASH = argv.hash
+const isPROD = argv.prod    // 是否生产环境
+const isHASH = argv.hash    // 是否开启 文件hash版本
+
+/** 
+ * 配置
+*/
+const CONFIG = require('./gulp.conf')
+const SRC = CONFIG.src
+const DIST = CONFIG.dist
+const SRC_OPTION = { base: SRC.dir }
+const DIST_OPTION = { base: DIST.dir }
+const MANIFEST_PATH = `${DIST.dir}/manifest/`
+
+
 
 /**
  * 转换文件 hash 方式
@@ -85,14 +82,20 @@ function transformHash (json) {
   return newObj
 }
 
+
 /**
- * 处理 manifest转换管道任务
+ * 管道任务
 */
+
+// 处理 manifest转换管道任务
 const manifestTask = (name) => {
   return lazypipe().pipe(rev).pipe(rev.manifest, `${name}_manifest.json`).pipe(jEditor, function (file) {
     return transformHash(file)
   }).pipe(gulp.dest, MANIFEST_PATH)
 }
+// 路径替换任务
+const pathTask = lazypipe().pipe(replace, CONFIG.path.root[1], CONFIG.path.root[0]).pipe(replace, CONFIG.path.asset[1], CONFIG.path.asset[0])
+
 
 /**
  * 启动本地服务器
@@ -102,8 +105,8 @@ gulp.task('server', function () {
   var webServe = connect.server({
     name: 'web',
     host: '0.0.0.0',
-    root: DIST_DIR,
-    port: PORT,
+    root: DIST.dir,
+    port: CONFIG.port.dev,
     livereload: true,
     middleware: function (connect, opt) {
       return [
@@ -133,8 +136,8 @@ gulp.task('server', function () {
  * 复制不需要处理的资源文件
  */
 gulp.task('build:assets', (done) => {
-  return gulp.src(static_files)
-    .pipe(gulp.dest(`${DIST_DIR}/${ASSETS_DIR}/`))
+  return gulp.src([SRC.public])
+    .pipe(gulp.dest(DIST.asset))
     .pipe(connect.reload())
 })
 
@@ -143,9 +146,9 @@ gulp.task('build:assets', (done) => {
  * 功能：压缩
  */
 gulp.task('build:image', (done) => {
-  gulp.src('src/images/**', OPTION)
-    .pipe(gulpif(PROD, imagemin()))
-    .pipe(gulp.dest(`${DIST_DIR}/${ASSETS_DIR}/`))
+  gulp.src(SRC.image, SRC_OPTION)
+    .pipe(gulpif(isPROD, imagemin()))
+    .pipe(gulp.dest(DIST.asset))
     .pipe(connect.reload())
     .on('end', () => {
       done()
@@ -153,7 +156,7 @@ gulp.task('build:image', (done) => {
     })
 })
 gulp.task('build:image:hash', (done) => {
-  gulp.src(`${DIST_DIR}/${ASSETS_DIR}/images/**`, { base: DIST_DIR })
+  gulp.src(DIST.image, DIST_OPTION)
     .pipe(manifestTask('image')())
     .on('end', done)
 })
@@ -164,19 +167,18 @@ gulp.task('build:image:hash', (done) => {
  */
 gulp.task('build:style', (done) => {
   const plugins = [
-    autoprefixer({ browsers: pkg.browserslist })
+    autoprefixer({ browsers: CONFIG.pkg.browserslist })
   ]
-  if (PROD) {
+  if (isPROD) {
     plugins.push(nano({ preset: "default" }))
   }
-  gulp.src('src/styles/*.scss', OPTION)
+  gulp.src(SRC.style, SRC_OPTION)
     .pipe(sourcemaps.init())
     .pipe(sass().on('error', sass.logError))
-    .pipe(replace('/@/', ROOT_PATH))
-    .pipe(replace('/@@/', ASSETS_PATH))
+    .pipe(pathTask())
     .pipe(postcss(plugins))
     .pipe(sourcemaps.write('./'))
-    .pipe(gulp.dest(`${DIST_DIR}/${ASSETS_DIR}/`))
+    .pipe(gulp.dest(DIST.asset))
     .pipe(connect.reload())
     .on('end', () => {
       done()
@@ -184,7 +186,7 @@ gulp.task('build:style', (done) => {
     })
 })
 gulp.task('build:style:hash', (done) => {
-  gulp.src(`${DIST_DIR}/${ASSETS_DIR}/styles/**`, { base: DIST_DIR })
+  gulp.src(DIST.style, DIST_OPTION)
     .pipe(manifestTask('style')())
     .on('end', done)
 })
@@ -194,21 +196,20 @@ gulp.task('build:style:hash', (done) => {
  * 功能：合并, 压缩, babel, sourcemap
  */
 gulp.task('build:script', (done) => {
-  let count = 0, sFiles = Object.keys(script_files)
+  let count = 0, sMap = SRC.scriptMap, sFiles = Object.keys(sMap)
 
   sFiles.map((file, key) => {
-    let files = script_files[file].map(item => `src/scripts/${item}`)
-    gulp.src(files, OPTION)
+    let files = sMap[file].map(item => `${SRC.dir}/scripts/${item}`)
+    gulp.src(files, SRC_OPTION)
       .pipe(sourcemaps.init())
       .pipe(concat(`scripts/${file}.js`))
-      .pipe(replace('/@/', ROOT_PATH))
-      .pipe(replace('/@@/', ASSETS_PATH))
+      .pipe(pathTask())
       .pipe(babel({
         presets: ['env']
       }))
-      .pipe(gulpif(PROD, uglify()))
+      .pipe(gulpif(isPROD, uglify()))
       .pipe(sourcemaps.write('./'))
-      .pipe(gulp.dest(`${DIST_DIR}/${ASSETS_DIR}/`))
+      .pipe(gulp.dest(DIST.asset))
       .pipe(connect.reload())
       .on('end', () => {
         count++
@@ -220,7 +221,7 @@ gulp.task('build:script', (done) => {
   })
 })
 gulp.task('build:script:hash', (done) => {
-  gulp.src(`${DIST_DIR}/${ASSETS_DIR}/scripts/**`, { base: DIST_DIR })
+  gulp.src(DIST.script, DIST_OPTION)
     .pipe(manifestTask('script')())
     .on('end', done)
 })
@@ -230,8 +231,8 @@ gulp.task('build:script:hash', (done) => {
  * 功能：替换, 版本控制, 模版渲染
  */
 gulp.task('build:html', () => {
-  let htmlArr = ['src/html/**']
-  if (HASH) {
+  let htmlArr = [SRC.html]
+  if (isHASH) {
     htmlArr.push(`${MANIFEST_PATH}/*.json`)
   }
   gulp.src(htmlArr, { base: '' })
@@ -245,12 +246,11 @@ gulp.task('build:html', () => {
         env: 'develop'
       }
     }))
-    .pipe(replace('/@/', ROOT_PATH))
-    .pipe(replace('/@@/', ASSETS_PATH))
-    .pipe(revCollector({
+    .pipe(pathTask())
+    .pipe(gulpif(isHASH, revCollector({
       revSuffix: '\\?[0-9a-f]{8,10}'
-    }))
-    .pipe(gulp.dest(DIST_DIR))
+    })))
+    .pipe(gulp.dest(DIST.dir))
     .pipe(connect.reload())
 })
 
@@ -258,7 +258,7 @@ gulp.task('build:html', () => {
  * 删除已发布的文件
  */
 gulp.task('clean', (done) => {
-  return del([MANIFEST_PATH, DIST_DIR]).then(paths => {
+  return del([MANIFEST_PATH, DIST.dir]).then(paths => {
     log('clean files: \n', paths.join('\n'))
   })
 })
@@ -270,7 +270,7 @@ gulp.task('build', ['clean'], (taskDone) => {
   runSequence('build:assets', ['build:image', 'build:style', 'build:script'], 'build:html', () => {
     taskDone()
     log(chalk.bgGreen('build success .... ✅ .'))
-    if (HASH) {
+    if (isHASH) {
       runSequence('build:image:hash', 'build:style:hash', 'build:script:hash', 'build:html')
     }
   })
@@ -280,11 +280,11 @@ gulp.task('build', ['clean'], (taskDone) => {
  * 监控文件变化
  */
 gulp.task('watch', () => {
-  gulp.watch(static_files, ['build:assets'])
-  gulp.watch(['src/images/**'], ['build:image'])
-  gulp.watch('src/styles/**', ['build:style'])
-  gulp.watch('src/scripts/**', ['build:script'])
-  gulp.watch('src/html/**', ['build:html'])
+  gulp.watch(SRC.public, ['build:assets'])
+  gulp.watch(SRC.image, ['build:image'])
+  gulp.watch(SRC.style, ['build:style'])
+  gulp.watch(SRC.script, ['build:script'])
+  gulp.watch(SRC.html, ['build:html'])
 })
 
 gulp.task('default', ['build'], () => {

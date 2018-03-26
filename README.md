@@ -13,10 +13,15 @@ Gulp开发web页面的自动化构建任务
 
 ### 文件目录
 
+参考：https://zhuanlan.zhihu.com/p/21312474
+
+
 ```
 ├─Project
 │  ├─docs                   // 文档
 │  ├─public                 // 静态资源
+│  │  ├─vendor              // 公共vendor
+│  │  ├─font
 │  ├─mock                   // 模拟数据
 │  ├─dist                   // 生成目录
 │  ├─src                    // 源文件
@@ -30,6 +35,8 @@ Gulp开发web页面的自动化构建任务
 │  │  ├
 │  ├─gulpfile.js            // gulp配置
 │  ├─package.js             // package.json
+│  ├─.babelrc               // babel-loader 配置
+│  ├─.gitignore                 // git 忽略项
 │  ├─README.md
 └─
 ```
