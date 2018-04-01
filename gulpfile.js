@@ -170,7 +170,18 @@ gulp.task('build:style', (done) => {
     autoprefixer({ browsers: CONFIG.pkg.browserslist })
   ]
   if (isPROD) {
+    // cssnano v4.0以下
+    plugins.push(nano({
+      autoprefixer: false,
+      discardUnused: false,
+      mergeIdents: false,
+      reduceIdents: false,
+      zindex: false
+    }))
+    /* 
+    // cssnano v4.0 以上预设环境，使用如下
     plugins.push(nano({ preset: "default" }))
+     */
   }
   gulp.src(SRC.style, SRC_OPTION)
     .pipe(sourcemaps.init())

@@ -1,6 +1,6 @@
 const SRC_DIR = 'src'
 const DIST_DIR = 'dist'
-const DIST_ASSET = 'dist/assets'
+const DIST_ASSET = DIST_DIR + '/assets'
 
 const pkg = require('./package.json')
 const scriptMap = require('./src/scripts/script.map')
