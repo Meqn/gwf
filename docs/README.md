@@ -160,6 +160,10 @@ gulp.task('default', () =>
   > 图片压缩  
   > https://github.com/sindresorhus/gulp-imagemin
 
+- gulp-css-spriter
+  > 雪碧图
+  > https://www.npmjs.com/package/gulp-css-spriter
+
 - sprity
   > 雪碧图
   > https://github.com/sprity/sprity
@@ -173,6 +177,10 @@ gulp.task('default', () =>
 - gulp-file-include
   > 引入文件(模版引擎)  
   > https://github.com/coderhaoxin/gulp-file-include
+
+- gulp-html-builder
+  > 对页面中引入的css文件和js文件进行合并并压缩到新文件
+  > https://www.npmjs.com/package/gulp-html-builder
 
 
 

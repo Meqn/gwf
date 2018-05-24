@@ -114,14 +114,15 @@ gulp.task('server', function () {
           target: 'http://api.test.com',
           changeOrigin: true
         }),
-        proxy('/mock/v1', {
+        proxy('/mock/v1/', {
           target: 'http://192.168.1.100',
           changeOrigin: true
         })
       ]
     }
   }, function() {
-    let webUrl = `${this.https ? 'https' : 'http'}://${this.host}:${this.port}/`
+    const {https, host, port} = this
+    let webUrl = `${https ? 'https' : 'http'}://${host}:${port}/`
     setTimeout(() => {
       open(webUrl)
     }, 1000)

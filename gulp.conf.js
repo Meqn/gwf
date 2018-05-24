@@ -3,7 +3,7 @@ const DIST_DIR = 'dist'
 const DIST_ASSET = DIST_DIR + '/assets'
 
 const pkg = require('./package.json')
-const scriptMap = require('./src/scripts/script.map')
+const scriptMap = require('./src/scripts/vendor.map')
 
 const port = {
   dev: 3010,
