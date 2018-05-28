@@ -1,5 +1,6 @@
-function myname ({name, age}) {
+
+function myName ({ name }) {
   console.log(`my name is ${name}`)
 }
 
-myname({name: 'Jhon', age: '20', like: 'read'})
+myName({ name: 'Jhon', age: '20', like: 'read' })
