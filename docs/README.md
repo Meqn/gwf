@@ -195,7 +195,15 @@ gulp.task('default', () =>
 <link rel="stylesheet" href="/assets/css/common.css?2c0d21e40c" />
 ```
 
+2. 打开浏览器
+
+https://github.com/sindresorhus/opn
+
+
+
 
 ## references
 
 - https://github.com/Tencent/tmt-workflow
+
+

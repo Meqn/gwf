@@ -82,3 +82,12 @@ gulp.src(['assets/css/*.css'], {base: 'assets'})
 gulp.src()
   .pipe(revCollector())     // 默认规则: '-[0-9a-f]{8,10}-?'
 ```
+
+
+
+
+## 自定义
+
+参考：
+https://github.com/atamas101/gulp-rev-format
+
