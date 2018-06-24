@@ -7,7 +7,8 @@
     "start": "npm run dev",
     "dev": "gulp --watch --server",
     "build": "gulp build",
-    "product": "gulp build --prod --hash"
+    "product": "gulp build --prod --hash",
+    "lint": "gulp lint"
   },
   "repository": {
     "type": "git",
@@ -36,6 +37,7 @@
     "gulp-concat": "^2.6.1",
     "gulp-connect": "^5.5.0",
     "gulp-data": "^1.3.1",
+    "gulp-eslint": "^4.0.2",
     "gulp-file-include": "^2.0.1",
     "gulp-html-tpl": "^0.5.2",
     "gulp-htmlmin": "^4.0.0",

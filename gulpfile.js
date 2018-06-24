@@ -27,6 +27,7 @@ const proxy = require('http-proxy-middleware')
 const open = require('open')
 const chalk = require('chalk')
 const log = require('fancy-log')
+const eslint = require('gulp-eslint')
 
 const rename = require('gulp-rename')
 const concat = require('gulp-concat')
@@ -286,6 +287,13 @@ gulp.task('build', ['clean'], (taskDone) => {
       runSequence('build:image:hash', 'build:style:hash', 'build:script:hash', 'build:html')
     }
   })
+})
+
+gulp.task('lint', done => {
+  gulp.src(SRC.script, SRC_OPTION)
+    .pipe(eslint())
+    .pipe(eslint.format())
+    .pipe(eslint.failAfterError())
 })
 
 /**
