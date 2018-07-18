@@ -44,10 +44,10 @@ const uglify = require('gulp-uglify')
 const babel = require('gulp-babel')
 const imagemin = require('gulp-imagemin')
 const sprity = require('sprity')
-const includer = require('gulp-file-include')
 const htmlmin = require('gulp-htmlmin')
-const htmltpl = require('gulp-html-tpl')
-const artTemplate = require('art-template')
+const template = require('gulp-art-tpl')
+const preprocess = require('gulp-preprocess')
+const plumber = require('gulp-plumber')
 
 
 const isPROD = argv.prod    // 是否生产环境
@@ -149,7 +149,8 @@ gulp.task('build:assets', (done) => {
  */
 gulp.task('build:image', (done) => {
   gulp.src(SRC.image, SRC_OPTION)
-    .pipe(gulpif(isPROD, imagemin()))
+    .pipe(plumber())
+    // .pipe(gulpif(isPROD, imagemin()))
     .pipe(gulp.dest(DIST.asset))
     .pipe(connect.reload())
     .on('end', () => {
@@ -187,6 +188,7 @@ gulp.task('build:style', (done) => {
   }
   gulp.src(SRC.style, SRC_OPTION)
     .pipe(sourcemaps.init())
+    .pipe(plumber())
     .pipe(sass().on('error', sass.logError))
     .pipe(pathTask())
     .pipe(postcss(plugins))
@@ -215,6 +217,10 @@ gulp.task('build:script', (done) => {
     let files = sMap[file].map(item => `${SRC.dir}/scripts/${item}`)
     gulp.src(files, SRC_OPTION)
       .pipe(sourcemaps.init())
+      .pipe(plumber())
+      .pipe(preprocess({
+        env: isPROD ? 'production' : 'development'
+      }))
       .pipe(concat(`scripts/${file}.js`))
       .pipe(pathTask())
       .pipe(babel({
@@ -249,15 +255,13 @@ gulp.task('build:html', () => {
     htmlArr.push(`${MANIFEST_PATH}/*.json`)
   }
   gulp.src(htmlArr, { base: '' })
-    .pipe(htmltpl({
-      tag: 'template',
-      dataTag: 'data',
-      engine (template, data) {
-        return artTemplate.compile(template)(data)
-      },
-      data: {
-        env: 'develop'
-      }
+    .pipe(plumber())
+    .pipe(preprocess({
+      env: isPROD ? 'production' : 'development'
+    }))
+    .pipe(template({
+      env: isPROD ? 'production' : 'development',
+      author: 'Mervin'
     }))
     .pipe(pathTask())
     .pipe(gulpif(isHASH, revCollector({

@@ -1,18 +1,18 @@
-<template src="./includes/meta.html" title="Hello World">
-{
+<% include('./includes/meta.html', {
   title: '首页',
   styles: ['base.css', 'index.css'],
   scripts: ['comm/base.js', 'index.js']
-}
-</template>
+}) %>
 </head>
 <body>
 <div class="container">
-  <template src="./includes/header.html" page="index"></template>
+  <% include('./includes/header.html', {
+    page: 'index'
+  }) %>
   <main class="index">
     <h1>page Index content</h1>
   </main>
-  <template src="./includes/footer.html"></template>
+  {{include './includes/footer.html'}}
 </div>
 </body>
 </html>

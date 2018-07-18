@@ -200,6 +200,13 @@ gulp.task('default', () =>
 https://github.com/sindresorhus/opn
 
 
+3. 管道错误
+
+- [gulp-plumber](https://github.com/floatdrop/gulp-plumber)
+
+
+
+
 
 
 ## references
