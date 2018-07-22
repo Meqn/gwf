@@ -10,5 +10,7 @@
 <meta name="description" content="{{description}}">
 <meta name="keywords" content="{{keywords}}">
 <link rel="shortcut icon" href="/@@/favicon.ico" type="image/x-icon">
-{{each styles}}<link href="/@@/styles/{{$value}}" rel="stylesheet">{{/each}}
-{{each scripts}}<script src="/@@/scripts/{{$value}}"></script>{{/each}}
+{{each styles}}
+<link href="/@@/styles/{{$value}}" rel="stylesheet">{{/each}}
+{{each scripts}}
+<script src="/@@/scripts/{{$value}}"></script>{{/each}}

@@ -1,3 +1,5 @@
 function index() {
-  console.log('index page ...')
+  /* @if env='production' **
+  console.log('production')
+  /* @endif */
 }

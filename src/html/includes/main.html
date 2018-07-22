@@ -1,0 +1,22 @@
+<% var news = [{
+    summary: '残酷了比赛，温柔了时光'
+  }, {
+    summary: '其实阳台才是最适合做书房的空间'
+  }, {
+    summary: '读书无止境 阅读有方法'
+  }]
+%>
+<div class="news">
+  <h2>{{title}}</h2>
+  <ul>
+  {{each news}}
+    {{if $index === 1}}
+    <li class="active">
+    {{else}}
+    <li>
+    {{/if}}
+      {{$value.summary}}
+    </li>
+  {{/each}}
+  </ul>
+</div>

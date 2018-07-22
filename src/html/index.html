@@ -1,5 +1,7 @@
 <% include('./includes/meta.html', {
-  title: '首页',
+  title: '前端工作流',
+  description: '',
+  keywords: '',
   styles: ['base.css', 'index.css'],
   scripts: ['comm/base.js', 'index.js']
 }) %>
@@ -7,10 +9,12 @@
 <body>
 <div class="container">
   <% include('./includes/header.html', {
-    page: 'index'
+    content: '头部模块'
   }) %>
   <main class="index">
-    <h1>page Index content</h1>
+    <% include('./includes/main.html', {
+      title: '新闻资讯'
+    }) %>
   </main>
   {{include './includes/footer.html'}}
 </div>
