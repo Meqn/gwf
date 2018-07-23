@@ -287,7 +287,7 @@ gulp.task('lint', done => {
 /**
  * 任务：删除已发布的文件
  */
-gulp.task('clean', (done) => {
+gulp.task('clean', done => {
   return del([DIST.dir], {
     force: true
   }).then(paths => {

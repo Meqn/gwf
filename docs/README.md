@@ -200,11 +200,10 @@ gulp.task('default', () =>
 https://github.com/sindresorhus/opn
 
 
-3. 管道错误
+3. 错误处理，避免例外導致 gulp watch 失效中斷
 
 - [gulp-plumber](https://github.com/floatdrop/gulp-plumber)
-
-
+- [点击查看文档](https://kejyuntw.gitbooks.io/gulp-learning-notes/plguins/Tool/Plugins-Tool-gulp-plumber.html)
 
 
 
