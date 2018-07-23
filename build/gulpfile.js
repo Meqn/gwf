@@ -86,16 +86,12 @@ gulp.task('server', function () {
     port: CONFIG.port.dev,
     livereload: true,
     middleware: function (connect, opt) {
-      return [
-        proxy(['/user-service/api/v1'], {
-          target: 'http://test.app.hwariot.com',
-          changeOrigin: true
-        }),
-        proxy('/mock/v1/', {
-          target: 'http://192.168.1.100',
+      return CONFIG.proxy.map(item => {
+        return proxy(item.context, {
+          target: item.target,
           changeOrigin: true
         })
-      ]
+      })
     }
   }, function () {
     const { https, host, port } = this

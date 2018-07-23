@@ -72,6 +72,30 @@ https://github.com/doodlewind/legs/blob/master/README.md
 - gulp-connect
 - http-proxy-middleware
 
+```js
+gulp.task('server', function () {
+  var webServe = connect.server({
+    name: 'web',
+    host: '0.0.0.0',
+    root: DIST.dir,
+    port: CONFIG.port.dev,
+    livereload: true,
+    middleware: function (connect, opt) {
+      return [
+        proxy(['/api/v1'], {
+          target: 'http://api.example.com',
+          changeOrigin: true
+        }),
+        proxy('/mock/v1/', {
+          target: 'http://192.168.1.100',
+          changeOrigin: true
+        })
+      ]
+    }
+  })
+})
+```
+
 
 ### utils
 
