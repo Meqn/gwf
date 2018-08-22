@@ -232,8 +232,3 @@ https://github.com/sindresorhus/opn
 
 
 
-## references
-
-- https://github.com/Tencent/tmt-workflow
-
-
