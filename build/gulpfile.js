@@ -9,7 +9,7 @@ const connect = require('gulp-connect')
 const proxy = require('http-proxy-middleware')
 const open = require('open')
 const chalk = require('chalk')
-const log = require('fancy-log')
+const log = require('diy-log')
 
 const plumber = require('gulp-plumber')
 const eslint = require('gulp-eslint')
@@ -73,6 +73,13 @@ const pathTask = lazypipe()
   .pipe(replace, CONFIG.alias.root[1], CONFIG.alias.root[0])
   .pipe(replace, CONFIG.alias.asset[1], CONFIG.alias.asset[0])
 
+/**
+ * 错误信息处理
+ */
+function onError(error) {
+  const { name, plugin, message } = error
+  log.error(`${plugin} ${name} : ${message}`)
+}
 
 /*******************************************************************************************
  * 任务：启动本地HTTP 服务
@@ -99,9 +106,9 @@ gulp.task('server', function () {
     setTimeout(() => {
       open(webUrl)
     }, 1000)
-    log(chalk.yellow('😀 :::::::::::::::::::::::::::::::::::::::: 😀'))
-    log(`Open in browser : ${chalk.blue(webUrl)}`)
-    log(chalk.yellow('😀 :::::::::::::::::::::::::::::::::::::::: 😀'))
+    log.time(chalk.yellow('😀 :::::::::::::::::::::::::::::::::::::::: 😀'))
+    log.time(`Open in browser : ${chalk.blue(webUrl)}`)
+    log.time(chalk.yellow('😀 :::::::::::::::::::::::::::::::::::::::: 😀'))
   })
 })
 
@@ -115,7 +122,7 @@ gulp.task('build:static', done => {
     .pipe(connect.reload())
     .on('end', () => {
       done()
-      log('🚀 . build public done ... ')
+      log.time('🚀 . build public done ... ')
     })
 })
 
@@ -132,7 +139,7 @@ gulp.task('build:image', done => {
     .pipe(connect.reload())
     .on('end', () => {
       done()
-      log('🚀 . build image done ... ')
+      log.time('🚀 . build image done ... ')
     })
 })
 
@@ -174,7 +181,7 @@ gulp.task('build:style', done => {
     .pipe(connect.reload())
     .on('end', () => {
       done()
-      log('🚀 . build style done ... ')
+      log.time('🚀 . build style done ... ')
     })
 })
 
@@ -183,43 +190,42 @@ gulp.task('build:style', done => {
  * 任务：处理 script文件
  * 功能：合并, 压缩, babel, sourcemap
  */
+function handleScript(name, files) {
+  return new Promise(resolve => {
+    gulp.src(files, SRC_OPTION)
+      .pipe(plumber())
+      .pipe(sourcemaps.init())
+      .pipe(preprocess({
+        env: isPROD ? 'production' : 'development'
+      }))
+      .pipe(concat(`scripts/${name}.js`))
+      .pipe(pathTask())
+      .pipe(babel({
+        presets: ['env']
+      }))
+      .pipe(gulpif(isPROD, uglify()))
+      .pipe(sourcemaps.write('./'))
+      .pipe(gulp.dest(DIST.asset))
+      .pipe(connect.reload())
+      .on('end', resolve)
+  })
+  
+}
+
 gulp.task('build:script', done => {
-  const Entries = Object.entries(SRC.scriptMap)
-  const buildIt = (function () {
-    let i = 0
-    return function (file, list) {
-      const files = list.map(item => `${SRC.dir}/scripts/${item}`)
-      gulp.src(files, SRC_OPTION)
-        .pipe(plumber())
-        .pipe(sourcemaps.init())
-        .pipe(preprocess({
-          env: isPROD ? 'production' : 'development'
-        }))
-        .pipe(concat(`scripts/${file}.js`))
-        .pipe(pathTask())
-        .pipe(babel({
-          presets: ['env']
-        }))
-        .pipe(gulpif(isPROD, uglify()))
-        .pipe(sourcemaps.write('./'))
-        .pipe(gulp.dest(DIST.asset))
-        .pipe(connect.reload())
-        .on('end', () => {
-          i++
-          if (i === Entries.length) {
-            if (isHASH) {
-              gulp.start('build:script:hash')
-            }
-            done()
-            log('🚀 . build script done ... ')
-          }
-        })
-    }
-  }())
-  Entries.map(item => {
-    buildIt(item[0], item[1])
+  let tasks = []
+  const fileObj = SRC.scriptMap
+  for (let name in fileObj) {
+    let files = fileObj[name].map(item => `${SRC.dir}/scripts/${item}`)
+    tasks.push(handleScript(name, files))
+  }
+
+  Promise.all(tasks).then(res => {
+    done()
+    log.time('🚀   build script complete ! ... ')
   })
 })
+
 gulp.task('build:script:hash', done => {
   gulp.src(`${DIST.asset}/scripts/**`, DIST_OPTION)
     .pipe(manifestTask('script'))
@@ -252,7 +258,7 @@ gulp.task('build:html', done => {
     .pipe(connect.reload())
     .on('end', () => {
       done()
-      log('🚀 . build html done ... ')
+      log.time('🚀 . build html done ... ')
     })
 })
 
@@ -287,7 +293,7 @@ gulp.task('clean', done => {
   return del([DIST.dir], {
     force: true
   }).then(paths => {
-    log('Files be deleted: \n', paths.join('\n'))
+    log.time('Files be deleted: \n', paths.join('\n'))
   })
 })
 
@@ -298,7 +304,7 @@ gulp.task('build', ['clean'], taskDone => {
   runSequence(['build:static', 'build:image'], ['build:style', 'build:script'], () => {
     runSequence('build:html')
     taskDone()
-    log(chalk.bgGreen('build success .... ✅ .'))
+    log.time(log.symbols.success, chalk.bgGreen('build success .... ✅ .'))
   })
 })
 
