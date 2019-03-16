@@ -181,8 +181,9 @@ gulp.task('default', () =>
 ### images
 
 - gulp-imagemin
-  > 图片压缩  
+  > 图片压缩  (它基于 imagemin插件开发，png图片可以使用 imagemin-pngquant 深度压缩)
   > https://github.com/sindresorhus/gulp-imagemin
+  > https://github.com/imagemin/imagemin
 
 - gulp-css-spriter
   > 雪碧图

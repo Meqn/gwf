@@ -15,6 +15,9 @@ module.exports = {
   extends: "eslint:recommended",
   // add your custom rules here
   rules: {
+    // allow debugger during development
+    'no-console': process.env.NODE_ENV === 'production' ? 'error' : 'off',
+    'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
     // allow async-await
     'generator-star-spacing': 'off',
     'no-unexpected-multiline': 0,
@@ -26,7 +29,10 @@ module.exports = {
     'camelcase': 0,
     'no-unused-vars': 0,
     'no-console': 0,
-    // allow debugger during development
-    'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off'
+  },
+  globals: {
+    document: true,
+    location: true,
+    window: true,
   }
 }

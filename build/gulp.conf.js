@@ -1,52 +1,54 @@
-const pathResolve = require('./gulp.util').resolve
-const pkg = require(pathResolve('package.json'))
+/**
+ * gulp 全局配置文件
+ */
+const path = require('path')
 
-// 源目录
-const src_name = 'src'
-// 目标目录
-const dest_name = 'dist'
-// 本地 HTTP服务端口
-const port = {
-  dev: 3010,
-  mock: 3012
+function resolve(dir) {
+  return path.join(__dirname, '..', dir)
 }
-// 本地 HTTP服务代理
-const proxy = [{
-  context: ['/api/v1'],
-  target: 'http://api.example.com'
-}, {
-  context: '/mock/v1/',
-  target: 'http://192.168.1.100'
-}]
 
-const src_dir = pathResolve(src_name)
-const scriptMap = require(pathResolve(`${src_name}/scripts/vendor.map`))
-const src = {
+// package.json 文件
+const pkg = require(resolve('package.json'))
+// 源文件目录
+const src_dir = resolve('src')
+// 目标文件目录
+const dest_dir = resolve('dist')
+// 源文件路径
+const src_path = {
   dir: src_dir,
-  public: pathResolve('public/**'),
-  html: `${src_dir}/html/**/*.html`,
-  image: `${src_dir}/images/**`,
-  style: `${src_dir}/styles/*.scss`,
-  script: `${src_dir}/scripts/**`,
-  scriptMap: scriptMap
+  public: resolve('public/**'),
+  html: `${src_dir}/views/**/*.html`,
+  image: `${src_dir}/images/**/*.{png,jpg,gif,svg,jpeg}`,
+  style: `${src_dir}/styles/**`,
+  script: `${src_dir}/scripts/**/*.{js,mjs}`,
 }
-const dist = {
-  dir: pathResolve(dest_name),
-  asset: pathResolve(`${dest_name}/static`)
+// 目标文件路径
+const dest_path = {
+  dir: dest_dir,
+  asset: `${dest_dir}/static`,
+  manifest: `${dest_dir}/manifest`
 }
-
-// 路径替换别名
+// 替换别名
 const alias = {
-  root: ['/', '/@/'],
-  asset: ['/static/', '/@@/']
+  '/@/': '/',
+  '/@@/': '/static/',
+  __root: '/',
+  __asset: '/static',
+  __css: '/static/styles',
+  __img: '/static/images',
+  __js: '/static/scripts'
 }
 
+// 全局上下文变量
+const preprocessContext = {
+  env: 'production'
+}
 
 module.exports = {
-  src,
-  dist,
-  pkg,
-  port,
+  pathResolve: resolve,
+  src_path,
+  dest_path,
   alias,
-  proxy
+  pkg,
+  preprocessContext
 }

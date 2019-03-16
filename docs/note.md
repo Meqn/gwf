@@ -105,7 +105,8 @@ gulp.src('./src/*.ext')
 
 ```js
 cosnt alias = {
-  __: '/',
+  __root: '/',
+  __asset: '/static',
   __css: '/static/styles',
   __img: '/static/images',
   __js: '/static/scripts'
