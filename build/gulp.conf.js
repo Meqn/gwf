@@ -49,6 +49,20 @@ const preprocessContext = {
   env: ENV
 }
 
+// http serve 配置
+const httpServe = {
+  port: 3000,
+  proxy: [
+    {
+      context: ['/api/v1'],
+      target: 'http://api.example.com'
+    }, {
+      context: '/mock/v1/',
+      target: 'http://192.168.1.100'
+    }
+  ]
+}
+
 module.exports = {
   ENV,
   isProd,
@@ -58,5 +72,6 @@ module.exports = {
   dest_path,
   alias,
   pkg,
-  preprocessContext
+  preprocessContext,
+  httpServe
 }

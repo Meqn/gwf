@@ -6,10 +6,10 @@ const zip = require('gulp-zip')
 // http server
 const browserSync = require('browser-sync').create()
 const reload = browserSync.reload
-const httpConfig = require('./build/server')
+const proxy = require('http-proxy-middleware')
 
 // 配置文件
-const { ENV, isProd, isHash, src_path, dest_path, pkg } = require('./build/gulp.conf')
+const { ENV, isProd, isHash, src_path, dest_path, httpServe, pkg } = require('./build/gulp.conf')
 // static, img, js, css, html任务
 const { buildPublic, buildImage } = require('./build/gulp.static')
 const buildStyle = require('./build/gulp.style')
@@ -48,7 +48,29 @@ task('watch', done => {
 
 // 👻 http服务
 task('server', (cb) => {
-  browserSync.init(httpConfig, cb)
+  browserSync.init({
+    port: httpServe.port,
+    server: {
+      baseDir: dest_path.dir,
+      index: 'index.html'
+    },
+    middleware: httpServe.proxy.map(v => {
+      return proxy(v.context, {
+        target: v.target,
+        changeOrigin: true
+      })
+    }),
+    // 是否开启多端操作同步 (镜像)
+    ghostMode: {
+      clicks: false,   // 点击
+      forms: false,    // 表单
+      scroll: false   // 滚动
+    },
+    // 是否自动打开浏览器
+    open: 'external', //打开本地主机URL
+    //不显示在浏览器中的任何通知
+    notify: false
+  }, cb)
 })
 
 // 🤖 帮助文档
