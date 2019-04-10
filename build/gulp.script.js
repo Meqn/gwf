@@ -13,7 +13,7 @@ const eslint = require('gulp-eslint')
 const stripDebug = require('gulp-strip-debug')
 
 const { taskManifest, taskReplace, onError } = require('./gulp.util')
-const { src_path, dest_path, preprocessContext, pathResolve } = require('./gulp.conf')
+const { isProd, isHash, src_path, dest_path, preprocessContext, pathResolve } = require('./gulp.conf')
 // js入口文件，相对 src/scripts/ 目录
 const entry = require('./entry.script')
 
@@ -24,7 +24,7 @@ const entry = require('./entry.script')
  * @param {String} name 输出的文件名
  * @param {Array} files 源文件
  */
-function handleScript(name, files, isProd) {
+function handleScript(name, files) {
   return new Promise(resolve => {
     src(files, { base: src_path.dir, sourcemaps: true })
       .pipe(plumber(onError))
@@ -46,41 +46,35 @@ function scriptHash(done) {
     .on('end', done)
 }
 
-function script({ isProd, isHash }) {
-  return function (done) {
-    let tasks = []
-    for (const name in entry) {
-      const files = entry[name].map(item => `${src_path.dir}/scripts/${item}`)
-      tasks.push(handleScript(name, files, isProd))
-    }
-    return Promise.all(tasks).then(res => {
-      if (isHash) {
-        scriptHash(done)
-      } else {
-        done()
-      }
-    })
+function script(done) {
+  let tasks = []
+  for (const name in entry) {
+    const files = entry[name].map(item => `${src_path.dir}/scripts/${item}`)
+    tasks.push(handleScript(name, files))
   }
+  return Promise.all(tasks).then(res => {
+    if (isHash) {
+      scriptHash(done)
+    } else {
+      done()
+    }
+  })
 }
 
 // eslint
-function lint({ isProd }) {
-  return function(done) {
-    return src(src_path.script)
-      .pipe(plumber(onError))
-      .pipe(gulpif(isProd, stripDebug()))
-      .pipe(eslint({
-        configFile: pathResolve('./.eslintrc.js')
-      }))
-      .pipe(eslint.format())
-      .pipe(eslint.failAfterError())
-      .on('end', done)
-  }
+function lint(done) {
+  return src(src_path.script)
+    .pipe(plumber(onError))
+    .pipe(gulpif(isProd, stripDebug()))
+    .pipe(eslint({
+      configFile: pathResolve('./.eslintrc.js')
+    }))
+    .pipe(eslint.format())
+    .pipe(eslint.failAfterError())
+    .on('end', done)
 }
 
-module.exports = function ({ isProd, isHash }) {
-  return {
-    buildScript: script({ isProd, isHash }),
-    lint: lint({ isProd, isHash })
-  }
+module.exports = {
+  buildScript: script,
+  lint: lint
 }

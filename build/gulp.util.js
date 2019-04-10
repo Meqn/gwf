@@ -3,6 +3,7 @@
  */
 const path = require('path')
 const { dest } = require('gulp')
+const log = require('diy-log')
 const lazypipe = require('lazypipe')
 const jEditor = require('gulp-json-editor')
 const rev = require('gulp-rev')

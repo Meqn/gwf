@@ -1,5 +1,4 @@
 const { task, watch, src, dest, parallel, series } = require('gulp')
-const yargs = require('yargs').argv
 const del = require('del')
 const log = require('diy-log')
 const chalk = require('chalk')
@@ -8,18 +7,17 @@ const zip = require('gulp-zip')
 const browserSync = require('browser-sync').create()
 const reload = browserSync.reload
 const httpConfig = require('./build/server')
-// 环境
-process.env.NODE_ENV = yargs.env || 'development'
-const isProd = yargs.env === 'production' ? true : false
-const isHash = !!yargs.hash
 
 // 配置文件
-const { src_path, dest_path, pkg } = require('./build/gulp.conf')
+const { ENV, isProd, isHash, src_path, dest_path, pkg } = require('./build/gulp.conf')
 // static, img, js, css, html任务
-const { buildPublic, buildImage } = require('./build/gulp.static')({ isProd, isHash })
-const buildStyle = require('./build/gulp.style')({ isProd, isHash })
-const { buildScript, lint } = require('./build/gulp.script')({ isProd, isHash })
-const buildHtml = require('./build/gulp.html')({ isProd, isHash })
+const { buildPublic, buildImage } = require('./build/gulp.static')
+const buildStyle = require('./build/gulp.style')
+const { buildScript, lint } = require('./build/gulp.script')
+const buildHtml = require('./build/gulp.html')
+
+// 环境
+process.env.NODE_ENV = ENV
 
 // ❌ 清除打包文件
 task('clean', done => {
@@ -62,7 +60,7 @@ function help(done) {
     任务列表    gulp --tasks
     执行压缩    gulp zip
   ---------------------------------------`
-  console.log(chalk.green(content))
+  log(chalk.green(content))
   done()
 }
 

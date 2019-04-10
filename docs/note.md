@@ -1,14 +1,15 @@
 
 ## Todo
 
- * [ ] plumber 错误信息处理
- * [ ] npm run 文档说明
- * [ ] zip 压缩
+ * [x] plumber 错误信息处理
+ * [x] npm run 文档说明
+ * [x] zip 压缩
  * [ ] webpack 处理JS
- * [ ] HTTP服务替换 browser-sync
+ * [x] HTTP服务替换 browser-sync
  * [ ] Mock模拟数据
  * [ ] Eslint 配置
- * [ ] script.map循环任务使用 promise (bluebird)
+ * [x] script.map循环任务使用 promise (bluebird)
+ * [ ] 页面环境变量控制
 
 
 

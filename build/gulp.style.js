@@ -11,7 +11,7 @@ const autoprefixer = require('autoprefixer')
 const cssnano = require('cssnano')
 
 const { taskManifest, taskReplace, onError } = require('./gulp.util')
-const { src_path, dest_path, pkg } = require('./gulp.conf')
+const { isProd, isHash, src_path, dest_path } = require('./gulp.conf')
 
 
 /** cssnano 用法
@@ -37,27 +37,23 @@ const { src_path, dest_path, pkg } = require('./gulp.conf')
  * 处理 style文件
  * 功能：scss, 自动补全, 压缩, sourcemap
  */
-function style({ isProd, isHash }) {
-  return function(done) {
-    const plugins = [
-      autoprefixer({
-        browsers: pkg.browserslist
-      })
-    ]
-    if (isProd) {
-      plugins.push(cssnano({
-        preset: 'default'
-      }))
-    }
-    return src(src_path.style, { base: src_path.dir, sourcemaps: true })
-      .pipe(plumber(onError))
-      .pipe(sass().on('error', sass.logError))
-      .pipe(taskReplace())
-      .pipe(postcss(plugins))
-      .pipe(dest(`${dest_path.asset}`, { sourcemaps: '.' }))
-      .pipe(gulpif(isHash, taskManifest('style')))
-      .on('end', done)
+function style(done) {
+  const plugins = [
+    autoprefixer()
+  ]
+  if (isProd) {
+    plugins.push(cssnano({
+      preset: 'default'
+    }))
   }
+  return src(src_path.style, { base: src_path.dir, sourcemaps: true })
+    .pipe(plumber(onError))
+    .pipe(sass().on('error', sass.logError))
+    .pipe(taskReplace())
+    .pipe(postcss(plugins))
+    .pipe(dest(`${dest_path.asset}`, { sourcemaps: '.' }))
+    .pipe(gulpif(isHash, taskManifest('style')))
+    .on('end', done)
 }
 
 module.exports = style

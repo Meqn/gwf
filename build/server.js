@@ -31,7 +31,6 @@ module.exports = {
   },
   // 是否自动打开浏览器
   open: 'external', //打开本地主机URL
-  browser: ['google chrome'],
   //不显示在浏览器中的任何通知
   notify: false
 }

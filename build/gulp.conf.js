@@ -2,6 +2,11 @@
  * gulp 全局配置文件
  */
 const path = require('path')
+const yargs = require('yargs').argv
+
+const ENV = yargs.env || 'development'
+const isProd = ENV === 'production' ? true : false
+const isHash = !!yargs.hash
 
 function resolve(dir) {
   return path.join(__dirname, '..', dir)
@@ -10,13 +15,13 @@ function resolve(dir) {
 // package.json 文件
 const pkg = require(resolve('package.json'))
 // 源文件目录
-const src_dir = resolve('src')
+const src_dir = 'src'
 // 目标文件目录
-const dest_dir = resolve('dist')
+const dest_dir = 'dist'
 // 源文件路径
 const src_path = {
   dir: src_dir,
-  public: resolve('public/**'),
+  public: 'public/**',
   html: `${src_dir}/views/**/*.html`,
   image: `${src_dir}/images/**/*.{png,jpg,gif,svg,jpeg}`,
   style: `${src_dir}/styles/**`,
@@ -41,10 +46,13 @@ const alias = {
 
 // 全局上下文变量
 const preprocessContext = {
-  env: 'production'
+  env: ENV
 }
 
 module.exports = {
+  ENV,
+  isProd,
+  isHash,
   pathResolve: resolve,
   src_path,
   dest_path,
