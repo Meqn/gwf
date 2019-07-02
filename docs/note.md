@@ -10,6 +10,8 @@
  * [ ] Eslint 配置
  * [x] script.map循环任务使用 promise (bluebird)
  * [ ] 页面环境变量控制
+ * [ ] 自定义配置文件
+ * [ ] 雪碧图
 
 
 
@@ -18,6 +20,8 @@
 
 1. 模版引擎选择：
   - art-Template
+  - handlebars
+  - ejs
   - Pug
 
 
@@ -30,13 +34,15 @@
  - css (无)
  - scss
  - less
+ - stylus
 
 
 
 ## script
 
 1. webpack
-2. map表 （entry 入口： entry.config.js）， 或在 package.js 增加字段
+2. rollup
+3. map表 （entry 入口： entry.config.js）， 或在 package.js 增加字段
   - 参考：[推荐使用Promise (Bluebird)](https://ask.helplib.com/javascript/post_7547092)
 
 
